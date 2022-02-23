@@ -3,8 +3,47 @@
 #include <string>
 #include <fstream>
 #include <algorithm>
+#include <chrono>
 
-void binarySearch(std::vector<std::string> &dictionary, std::string &query)
+int linearSearch(std::vector<std::string> &dictionary, std::string &query)
+{
+    /*Lowercase Query*/
+    std::transform(query.begin(), query.end(), query.begin(), ::tolower);
+
+
+    std::cout << "Binary Search starting...\n";    
+    
+    /*Get Start Time*/
+    std::chrono::time_point startTime = std::chrono::high_resolution_clock::now();
+
+    for (size_t i = 0; i < dictionary.size(); i++)
+    {
+        if (dictionary[i] == query)
+        {
+            /*Get End Time*/
+            std::chrono::time_point endTime = std::chrono::high_resolution_clock::now();
+
+            /*Calculate Time Duration in Microseconds*/
+            std::chrono::microseconds duration = std::chrono::duration_cast<std::chrono::microseconds>(endTime - startTime);
+
+            /*Word was located*/
+            std::cout << query << " is IN the dictionary at position " << i << " (" << duration.count() << " microseconds).\n";
+            return 0;
+        }
+    }      
+
+    /*Get End Time*/
+    std::chrono::time_point endTime = std::chrono::high_resolution_clock::now();
+
+    /*Calculate Time Duration in Microseconds*/
+    std::chrono::microseconds duration = std::chrono::duration_cast<std::chrono::microseconds>(endTime - startTime);
+
+    std::cout << query << " is NOT IN the dictionary " << "(" << duration.count() << " microseconds).\n";
+
+    return -1;
+}
+
+int binarySearch(std::vector<std::string> &dictionary, std::string &query)
 {
     /*Lowercase Query*/
     std::transform(query.begin(), query.end(), query.begin(), ::tolower);
@@ -14,14 +53,26 @@ void binarySearch(std::vector<std::string> &dictionary, std::string &query)
     size_t maxIndex = dictionary.size();
     size_t midIndex;
 
+    std::cout << "Binary Search starting...\n";
+
+    /*Get Start Time*/
+    std::chrono::time_point startTime = std::chrono::high_resolution_clock::now();
+
     while (minIndex <= maxIndex)
     {
         midIndex = (minIndex + maxIndex) / 2;
 
         if (query == dictionary[midIndex]) //Check if query equals middle element
         {
+            /*Get End Time*/
+            std::chrono::time_point endTime = std::chrono::high_resolution_clock::now();
+
+            /*Calculate Time Duration in Microseconds*/
+            std::chrono::microseconds duration = std::chrono::duration_cast<std::chrono::microseconds>(endTime - startTime);
+            
             /*Word was located*/
-            std::cout << "Word located in dictionary at " << midIndex << " !" << std::endl;
+            std::cout << query << " is IN the dictionary at position " << midIndex << " (" << duration.count() << " microseconds).\n";
+            return 0;
         }
         else if (query > dictionary[midIndex]) //check if query is greater than the mid element
         {
@@ -33,8 +84,15 @@ void binarySearch(std::vector<std::string> &dictionary, std::string &query)
         }
     }
 
+    /*Get End Time*/
+    std::chrono::time_point endTime = std::chrono::high_resolution_clock::now();
+
+    /*Calculate Time Duration in Microseconds*/
+    std::chrono::microseconds duration = std::chrono::duration_cast<std::chrono::microseconds>(endTime - startTime);
+    
     /*Word was not located*/
-    std::cout << "Could not locate word in dictionary!" << std::endl;
+    std::cout << query << " is NOT IN the dictionary " << "(" << duration.count() << " microseconds).\n";
+    return -1;
 }
 
 int main()
@@ -43,16 +101,13 @@ int main()
 
     /*Initilaize dictionary*/
     std::vector<std::string> dictionary;
-    size_t wordNum = 0;
     std::string line;
     std::ifstream dictionaryFile("dictionary.txt");
 
     while (std::getline(dictionaryFile, line))
     {
-        dictionary[wordNum++] = line;
+        dictionary.push_back(line);
     }
-
-    std::cout << "LOADED " << wordNum << " words!"<< std::endl;
 
     /*Title*/
     std::cout << "|----- Welcome to Spell Checker -----|\n";
@@ -70,11 +125,15 @@ int main()
         {  
             /*Spell Check a Word(Linear Search)*/
             case 1:
+                std::cout << "\nPlease enter a word: ";
+                std::cin >> query;
+                std::cout << std::endl;
+                linearSearch(dictionary, query);
                 break;
  
             /*Spell Check a Word(Binary Search)*/
             case 2:
-                std::cout << "Please enter a word: " << std::endl;
+                std::cout << "\nPlease enter a word: ";
                 std::cin >> query;
                 std::cout << std::endl;
                 binarySearch(dictionary, query);
@@ -90,10 +149,11 @@ int main()
             
             /*Exit*/
             case 5:
-                std::cout << "ERROR: INVALID SELECTION!" << std::endl;
                 break;
 
             default:
+                std::cout << "\nERROR: INVALID SELECTION!\n";
+                exit(EXIT_FAILURE);
                 break;
         }
     }
